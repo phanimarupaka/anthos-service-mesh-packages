@@ -16,6 +16,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: envoy-access-log
 spec:
   meshConfig:
     accessLogFile: "/dev/stdout"

@@ -18,6 +18,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: iap-operator
 spec:
   components:
     ingressGateways:
