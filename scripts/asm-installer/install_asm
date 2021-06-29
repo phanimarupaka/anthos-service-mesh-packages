@@ -1357,8 +1357,8 @@ EOF
 }
 
 set_kpt_package_url() {
-  KPT_URL="https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages"
-  KPT_URL="${KPT_URL}.git/asm@${KPT_BRANCH}"
+  KPT_URL="https://github.com/phanimarupaka/anthos-service-mesh-packages"
+  KPT_URL="${KPT_URL}.git/asm@UpgradeToKptV1"
   readonly KPT_URL;
 }
 
@@ -1549,7 +1549,7 @@ EOF
   ln -s "${ISTIOCTL_REL_PATH}" .
 
   info "Downloading ASM kpt package..."
-  retry 3 kpt pkg get --auto-set=false "${KPT_URL}" asm
+  retry 3 kpt pkg get "${KPT_URL}" asm
   version_message > "${ASM_VERSION_FILE}"
 }
 
@@ -2451,48 +2451,48 @@ configure_package() {
 
   populate_cluster_values
   populate_environ_info
-  kpt cfg set asm gcloud.container.cluster "${CLUSTER_NAME}"
-  kpt cfg set asm gcloud.core.project "${PROJECT_ID}"
-  kpt cfg set asm gcloud.project.environProjectNumber "${PROJECT_NUMBER}"
+  gsed -ri "s/^(\s*)(gcloud.container.cluster:.*)/\1gcloud.container.cluster: ${CLUSTER_NAME}/" asm/setters.yaml
+  gsed -ri "s/^(\s*)(gcloud.core.project:.*)/\1gcloud.core.project: ${PROJECT_ID}/" asm/setters.yaml
+  gsed -ri "s/^(\s*)(gcloud.project.environProjectNumber:.*)/\1gcloud.project.environProjectNumber: ${PROJECT_NUMBER}/" asm/setters.yaml
   if [[ -n "${_CI_ENVIRON_PROJECT_NUMBER}" ]]; then
-    kpt cfg set asm gcloud.project.environProjectNumber "${_CI_ENVIRON_PROJECT_NUMBER}"
+    gsed -ri "s/^(\s*)(gcloud.project.environProjectNumber:.*)/\1gcloud.project.environProjectNumber: ${_CI_ENVIRON_PROJECT_NUMBER}/" asm/setters.yaml
   fi
-  kpt cfg set asm gcloud.compute.location "${CLUSTER_LOCATION}"
-  kpt cfg set asm gcloud.compute.network "${GCE_NETWORK_NAME}"
-  kpt cfg set asm anthos.servicemesh.rev "${REVISION_LABEL}"
-  kpt cfg set asm anthos.servicemesh.tag "${RELEASE}"
+  gsed -ri "s/^(\s*)(gcloud.compute.location:.*)/\1gcloud.compute.location: ${CLUSTER_LOCATION}/" asm/setters.yaml
+  gsed -ri "s/^(\s*)(gcloud.compute.network:.*)/\1gcloud.compute.network: ${GCE_NETWORK_NAME}/" asm/setters.yaml
+  gsed -ri "s/^(\s*)(anthos.servicemesh.rev:.*)/\1anthos.servicemesh.rev: ${REVISION_LABEL}/" asm/setters.yaml
+  gsed -ri "s/^(\s*)(anthos.servicemesh.tag:.*)/\1anthos.servicemesh.tag: ${RELEASE}/" asm/setters.yaml
   if [[ -n "${_CI_ASM_IMAGE_LOCATION}" ]]; then
-    kpt cfg set asm anthos.servicemesh.hub "${_CI_ASM_IMAGE_LOCATION}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.hub:.*)/\1anthos.servicemesh.hub: ${_CI_ASM_IMAGE_LOCATION}/" asm/setters.yaml
   fi
   if [[ -n "${_CI_ASM_IMAGE_TAG}" ]]; then
-    kpt cfg set asm anthos.servicemesh.tag "${_CI_ASM_IMAGE_TAG}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.tag:.*)/\1anthos.servicemesh.tag: ${_CI_ASM_IMAGE_TAG}/" asm/setters.yaml
   fi
 
   if [[ "${USE_HUB_WIP}" -eq 1 ]]; then
     # VM installation uses the latest Hub WIP format
     if [[ "${USE_VM}" -eq 1 ]]; then
-      kpt cfg set asm anthos.servicemesh.hubTrustDomain "${ENVIRON_PROJECT_ID}.svc.id.goog"
-      kpt cfg set asm anthos.servicemesh.hub-idp-url "${HUB_IDP_URL}"
+      gsed -ri "s/^(\s*)(anthos.servicemesh.hubTrustDomain:.*)/\1anthos.servicemesh.hubTrustDomain: ${ENVIRON_PROJECT_ID}.svc.id.goog/" asm/setters.yaml
+      gsed -ri "s/^(\s*)(anthos.servicemesh.hub-idp-url:.*)/\1anthos.servicemesh.hub-idp-url: ${HUB_IDP_URL}/" asm/setters.yaml
     # GKE-on-GCP installation uses legacy Hub WIP format to be consistent with GCP Hub public preview feature
     else
-      kpt cfg set asm anthos.servicemesh.hubTrustDomain "${ENVIRON_PROJECT_ID}.hub.id.goog"
-      kpt cfg set asm anthos.servicemesh.hub-idp-url "https://gkehub.googleapis.com/projects/${ENVIRON_PROJECT_ID}/locations/global/memberships/${HUB_MEMBERSHIP_ID}"
+      gsed -ri "s/^(\s*)(anthos.servicemesh.hubTrustDomain:.*)/\1anthos.servicemesh.hubTrustDomain: ${ENVIRON_PROJECT_ID}.hub.id.goog/" asm/setters.yaml
+      gsed -ri "s/^(\s*)(anthos.servicemesh.hub-idp-url:.*)/\1anthos.servicemesh.hub-idp-url: https://gkehub.googleapis.com/projects/${ENVIRON_PROJECT_ID}/locations/global/memberships/${HUB_MEMBERSHIP_ID}/" asm/setters.yaml
     fi
   fi
   if [[ -n "${CA_NAME}" && "${CA}" = "gcp_cas" ]]; then
-    kpt cfg set asm anthos.servicemesh.external_ca.ca_name "${CA_NAME}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.external_ca.ca_name:.*)/\1anthos.servicemesh.external_ca.ca_name: ${CA_NAME}/" asm/setters.yaml
   fi
 
   if [[ "${USE_VM}" -eq 1 ]] && [[ "${_CI_NO_REVISION}" -eq 0 ]]; then
-    kpt cfg set asm anthos.servicemesh.istiodHost "istiod-${REVISION_LABEL}.istio-system.svc"
-    kpt cfg set asm anthos.servicemesh.istiodHostFQDN "istiod-${REVISION_LABEL}.istio-system.svc.cluster.local"
-    kpt cfg set asm anthos.servicemesh.istiod-vs-name "istiod-vs-${REVISION_LABEL}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.istiodHost:.*)/\1anthos.servicemesh.istiodHost: istiod-${REVISION_LABEL}.istio-system.svc/" asm/setters.yaml
+    gsed -ri "s/^(\s*)(anthos.servicemesh.istiodHostFQDN:.*)/\1anthos.servicemesh.istiodHostFQDN: istiod-${REVISION_LABEL}.istio-system.svc.cluster.local/" asm/setters.yaml
+    gsed -ri "s/^(\s*)(anthos.servicemesh.istiod-vs-name:.*)/\1anthos.servicemesh.istiod-vs-name: istiod-vs-${REVISION_LABEL}/" asm/setters.yaml
   fi
 
   if [[ "${CA}" == "mesh_ca" ]]; then
     # set the trust domain aliases to include both new Hub WIP and old Hub WIP to achieve no downtime upgrade.
     TRUST_DOMAIN_ALIASES="${PROJECT_ID}.svc.id.goog ${PROJECT_ID}.hub.id.goog"
-    run eval kpt cfg set asm anthos.servicemesh.trustDomainAliases "${TRUST_DOMAIN_ALIASES}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.trustDomainAliases:.*)/\1anthos.servicemesh.trustDomainAliases: ${TRUST_DOMAIN_ALIASES}/" asm/setters.yaml
   fi
 
   if [[ "${CA}" == "mesh_ca" && -n "${_CI_TRUSTED_GCP_PROJECTS}" ]]; then
@@ -2505,7 +2505,8 @@ ${_CI_TRUSTED_GCP_PROJECTS}
 EOF
     # kpt treats words in quotes as a single param, while kpt need ${TRUST_DOMAIN_ALIASES} to be splitting params for a list. If we remove quotes, the lint will complain.
     # eval will translate the quoted TRUST_DOMAIN_ALIASES into params to workaround both.
-    run eval kpt cfg set asm anthos.servicemesh.trustDomainAliases "${TRUST_DOMAIN_ALIASES}"
+    #run eval kpt cfg set asm anthos.servicemesh.trustDomainAliases "${TRUST_DOMAIN_ALIASES}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.trustDomainAliases:.*)/\1anthos.servicemesh.trustDomainAliases: ${TRUST_DOMAIN_ALIASES}/" asm/setters.yaml
   fi
 
   if is_managed; then
@@ -2518,9 +2519,11 @@ EOF
       fatal "Failed to read configuration to install components for managed control plane!"
     fi
 
-    kpt cfg set asm anthos.servicemesh.controlplane.validation-url "${VALIDATION_URL}"
-    kpt cfg set asm anthos.servicemesh.managed-controlplane.cloudrun-addr "${CLOUDRUN_ADDR}"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.controlplane.validation-url:.*)/\1anthos.servicemesh.controlplane.validation-url: ${VALIDATION_URL}/" asm/setters.yaml
+    gsed -ri "s/^(\s*)(anthos.servicemesh.managed-controlplane.cloudrun-addr:.*)/\1anthos.servicemesh.managed-controlplane.cloudrun-addr: ${CLOUDRUN_ADDR}/" asm/setters.yaml
   fi
+
+  kpt fn render asm
 }
 
 print_config() {
@@ -2627,9 +2630,10 @@ EOF
 
     # The default istiod service is exposed so that any fallback on the VM side
     # to use the default Istiod service can still connect to the control plane.
-    kpt cfg set asm anthos.servicemesh.istiodHost "istiod.istio-system.svc"
-    kpt cfg set asm anthos.servicemesh.istiodHostFQDN "istiod.istio-system.svc.cluster.local"
-    kpt cfg set asm anthos.servicemesh.istiod-vs-name "istiod-vs"
+    gsed -ri "s/^(\s*)(anthos.servicemesh.istiodHost:.*)/\1anthos.servicemesh.istiodHost: istiod.istio-system.svc/" asm/setters.yaml
+    gsed -ri "s/^(\s*)(anthos.servicemesh.istiodHostFQDN:.*)/\1anthos.servicemesh.istiodHostFQDN: istiod.istio-system.svc.cluster.local/" asm/setters.yaml
+    gsed -ri "s/^(\s*)(anthos.servicemesh.istiod-vs-name:.*)/\1anthos.servicemesh.istiod-vs-name: istiod-vs/" asm/setters.yaml
+    kpt fn render asm
     expose_istiod
   fi
 
