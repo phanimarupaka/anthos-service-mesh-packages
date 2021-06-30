@@ -19,8 +19,8 @@ metadata:
   name: eastwest
 spec:
   profile: empty
-  hub: gcr.io/gke-release/asm # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.hub"}
-  tag: 1.10.2-asm.1 # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.tag"}
+  hub: gcr.io/gke-release/asm # kpt-set: ${anthos.servicemesh.hub}
+  tag: 1.10.2-asm.1 # kpt-set: ${anthos.servicemesh.tag}
   components:
     ingressGateways:
       - name: istio-eastwestgateway

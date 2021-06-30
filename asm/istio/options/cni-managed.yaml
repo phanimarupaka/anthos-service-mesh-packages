@@ -94,17 +94,17 @@ data:
   # The CNI network configuration to add to the plugin chain on each node.  The special
   # values in this config will be automatically populated.
   cni_network_config: |-
-        {
-          "cniVersion": "0.3.1",
-          "name": "istio-cni",
-          "type": "istio-cni",
-          "log_level": "info",
-          "kubernetes": {
-              "kubeconfig": "__KUBECONFIG_FILEPATH__",
-              "cni_bin_dir": "/home/kubernetes/bin",
-              "exclude_namespaces": [ "istio-system", "kube-system" ]
-          }
-        }
+    {
+      "cniVersion": "0.3.1",
+      "name": "istio-cni",
+      "type": "istio-cni",
+      "log_level": "info",
+      "kubernetes": {
+          "kubeconfig": "__KUBECONFIG_FILEPATH__",
+          "cni_bin_dir": "/home/kubernetes/bin",
+          "exclude_namespaces": [ "istio-system", "kube-system" ]
+      }
+    }
 ---
 kind: DaemonSet
 apiVersion: apps/v1
@@ -156,7 +156,7 @@ spec:
         # This container installs the Istio CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: "IMAGE_HUB/install-cni:IMAGE_TAG"  # {"$ref":"#/definitions/io.k8s.cli.substitutions.gke-cni-image"}
+          image: "IMAGE_HUB/install-cni:IMAGE_TAG" # kpt-set: ${anthos.servicemesh.hub}/install-cni:${anthos.servicemesh.tag}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -185,7 +185,7 @@ spec:
             - mountPath: /host/etc/cni/net.d
               name: cni-net-dir
         - name: repair-cni
-          image: "IMAGE_HUB/install-cni:IMAGE_TAG"  # {"$ref":"#/definitions/io.k8s.cli.substitutions.gke-cni-image"}
+          image: "IMAGE_HUB/install-cni:IMAGE_TAG" # kpt-set: ${anthos.servicemesh.hub}/install-cni:${anthos.servicemesh.tag}
           command: ["/opt/local/bin/istio-cni-repair"]
           env:
             - name: "REPAIR_NODE-NAME"

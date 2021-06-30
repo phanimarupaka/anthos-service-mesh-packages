@@ -15,6 +15,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: ca-migration-meshca
 spec:
   values:
     pilot:
@@ -25,5 +27,5 @@ spec:
     defaultConfig:
       proxyMetadata:
         PROXY_CONFIG_XDS_AGENT: "true"
-    trustDomainAliases: # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.trustDomainAliases"}
+    trustDomainAliases: # kpt-set: ${setters.anthos.servicemesh.trustDomainAliases}
       - "cluster.local"

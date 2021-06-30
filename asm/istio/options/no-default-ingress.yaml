@@ -16,9 +16,12 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: no-default-ingress
 spec:
   components:
     ingressGateways:
       - name: istio-ingressgateway
         enabled: false
+        # [END docs]
 # [END docs]

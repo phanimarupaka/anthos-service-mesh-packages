@@ -16,13 +16,13 @@
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 metadata:
-  name: INGRESSGATEWAY_NAME # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.custom-ingressgateway-name"}
+  name: INGRESSGATEWAY_NAME # kpt-set: ${anthos.servicemesh.custom-ingressgateway-name}
 spec:
   components:
     ingressGateways:
-      - name: INGRESSGATEWAY_NAME-ASM_REV # {"$ref":"#/definitions/io.k8s.cli.substitutions.custom-ingressgateway-deploy-name"}
+      - name: INGRESSGATEWAY_NAME-ASM_REV # kpt-set: ${anthos.servicemesh.custom-ingressgateway-name}-${anthos.servicemesh.rev}
         enabled: true
-        namespace: istio-system # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.custom-ingressgateway-namespace"}
+        namespace: istio-system # kpt-set: ${anthos.servicemesh.custom-ingressgateway-namespace}
         k8s:
           hpaSpec:
             maxReplicas: 5
@@ -31,7 +31,7 @@ spec:
           overlays:
             - apiVersion: extensions/v1beta1
               kind: Service
-              name: INGRESSGATEWAY_NAME-ASM_REV # {"$ref":"#/definitions/io.k8s.cli.substitutions.custom-ingressgateway-deploy-name"}
+              name: INGRESSGATEWAY_NAME-ASM_REV # kpt-set: ${anthos.servicemesh.custom-ingressgateway-name}-${anthos.servicemesh.rev}
               patches:
                 - path: metadata.name
-                  value: INGRESSGATEWAY_NAME # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.custom-ingressgateway-name"}
+                  value: INGRESSGATEWAY_NAME # kpt-set: ${anthos.servicemesh.custom-ingressgateway-name}

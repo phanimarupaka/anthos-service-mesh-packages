@@ -18,6 +18,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: iap-operator
 spec:
   components:
     ingressGateways:
@@ -28,11 +30,11 @@ spec:
             type: NodePort
             ports:
               - name: status-port
-                nodePort: 31223 # {"$ref":"#/definitions/io.k8s.cli.setters.gcloud.container.cluster.ingress.statusPort"}
+                nodePort: 31223 # kpt-set: ${gcloud.container.cluster.ingress.statusPort}
                 port: 15021
                 protocol: TCP
                 targetPort: 15021
-              - nodePort: 31224 # {"$ref":"#/definitions/io.k8s.cli.setters.gcloud.container.cluster.ingress.httpPort"}
+              - nodePort: 31224 # kpt-set: ${gcloud.container.cluster.ingress.httpPort}
                 port: 80
                 targetPort: 8080
                 name: http2

@@ -24,7 +24,7 @@ metadata:
 webhooks:
   - name: validation.istio.io
     clientConfig:
-      url: VALIDATION_URL # {"$ref":"#/definitions/io.k8s.cli.substitutions.validation-url"}
+      url: VALIDATION_URL # kpt-set: ${anthos.servicemesh.controlplane.validation-url}
       caBundle: "" # patched at runtime when the webhook is ready.
     rules:
       - operations:

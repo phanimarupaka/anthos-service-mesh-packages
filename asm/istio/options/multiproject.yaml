@@ -15,11 +15,13 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: multiproject
 spec:
   profile: asm-gcp-multiproject
   meshConfig:
-    trustDomainAliases: # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.trustDomainAliases"}
-      - "PROJECT_ID.svc.id.goog" # {"$ref":"#/definitions/io.k8s.cli.substitutions.trust-domain"}
+    trustDomainAliases: # kpt-set: ${setters.anthos.servicemesh.trustDomainAliases}
+      - "PROJECT_ID.svc.id.goog" # kpt-set: ${gcloud.core.project}.svc.id.goog
   values:
     global:
-      meshID: "proj-PROJECT_NUMBER" # {"$ref":"#/definitions/io.k8s.cli.substitutions.mesh-id"}
+      meshID: "proj-PROJECT_NUMBER" # kpt-set: proj-${gcloud.project.environProjectNumber}

@@ -16,6 +16,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: cni-selinux
 spec:
   components:
     cni:
@@ -34,4 +36,5 @@ spec:
       excludeNamespaces:
         - istio-system
         - kube-system
+        # [END docs]
 # [END docs]

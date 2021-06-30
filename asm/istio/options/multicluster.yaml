@@ -15,9 +15,11 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: multicluster
 spec:
   values:
     global:
       multiCluster:
         # Provided to ensure a human readable name rather than a UUID.
-        clusterName: "cn-PROJECTID-us-central1-c-asm-cluster" # {"$ref":"#/definitions/io.k8s.cli.substitutions.cluster-name"}
+        clusterName: "cn-PROJECTID-us-central1-c-asm-cluster" # kpt-set: cn-${gcloud.core.project}-${gcloud.compute.location}-${gcloud.container.cluster}

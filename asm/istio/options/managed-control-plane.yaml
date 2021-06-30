@@ -15,11 +15,13 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: managed-control-plane
 spec:
   revision: "asm-managed"
   profile: asm-gcp
-  hub: gcr.io/gke-release/asm # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.hub"}
-  tag: 1.10.2-asm.1 # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.tag"}
+  hub: gcr.io/gke-release/asm # kpt-set: ${anthos.servicemesh.hub}
+  tag: 1.10.2-asm.1 # kpt-set: ${anthos.servicemesh.tag}
   components:
     base:
       enabled: false
@@ -36,7 +38,7 @@ spec:
           app: istio-ingressgateway
           istio: ingressgateway
   meshConfig:
-    trustDomain: "PROJECT_ID.svc.id.goog" # {"$ref":"#/definitions/io.k8s.cli.substitutions.trust-domain"}
+    trustDomain: "PROJECT_ID.svc.id.goog" # kpt-set: ${gcloud.core.project}.svc.id.goog
     defaultConfig:
       proxyMetadata:
         CA_ROOT_CA: "/etc/ssl/certs/ca-certificates.crt"
@@ -44,7 +46,7 @@ spec:
         OUTPUT_CERTS: "/etc/istio/proxy"
         XDS_AUTH_PROVIDER: "gcp"
         XDS_HEADER_Cloud-Run-Enable-H2: "y"
-        ISTIO_META_CLOUDRUN_ADDR: "ISTIO_CLOUDRUN_ADDR" # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.managed-controlplane.cloudrun-addr"}
+        ISTIO_META_CLOUDRUN_ADDR: "ISTIO_CLOUDRUN_ADDR" # kpt-set: ${anthos.servicemesh.managed-controlplane.cloudrun-addr}
   values:
     gateways:
       istio-ingressgateway:
@@ -52,7 +54,7 @@ spec:
     global:
       sds:
         token:
-          aud: "PROJECT_ID.svc.id.goog" # {"$ref":"#/definitions/io.k8s.cli.substitutions.trust-domain"}
-      meshID: "proj-PROJECT_NUMBER" # {"$ref":"#/definitions/io.k8s.cli.substitutions.mesh-id"}
+          aud: "PROJECT_ID.svc.id.goog" # kpt-set: ${gcloud.core.project}.svc.id.goog
+      meshID: "proj-PROJECT_NUMBER" # kpt-set: proj-${gcloud.project.environProjectNumber}
       multiCluster:
-        clusterName: "cn-PROJECT_ID-CLUSTER_LOCATION-CLUSTER_NAME" # {"$ref":"#/definitions/io.k8s.cli.substitutions.cluster-name"}
+        clusterName: "cn-PROJECT_ID-CLUSTER_LOCATION-CLUSTER_NAME" # kpt-set: cn-${gcloud.core.project}-${gcloud.compute.location}-${gcloud.container.cluster}

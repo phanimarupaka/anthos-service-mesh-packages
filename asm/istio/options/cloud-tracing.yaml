@@ -16,6 +16,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: cloud-tracing
 spec:
   meshConfig:
     enableTracing: true
@@ -23,4 +25,5 @@ spec:
     global:
       proxy:
         tracer: stackdriver
+        # [END docs]
 # [END docs]

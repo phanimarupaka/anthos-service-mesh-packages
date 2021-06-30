@@ -16,6 +16,8 @@
 ---
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
+metadata:
+  name: internal-load-balancer
 spec:
   components:
     ingressGateways:
@@ -34,4 +36,5 @@ spec:
               - name: https
                 port: 443
                 targetPort: 8443
+                # [END docs]
 # [END docs]
