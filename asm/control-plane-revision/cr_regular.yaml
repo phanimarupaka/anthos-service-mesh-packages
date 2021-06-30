@@ -1,4 +1,3 @@
----
 apiVersion: mesh.cloud.google.com/v1alpha1
 kind: ControlPlaneRevision
 metadata:

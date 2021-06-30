@@ -1,34 +1,19 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
----
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 metadata:
   name: istio-operator
 spec:
   profile: empty
-  hub: gcr.io/gke-release/asm # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.hub"}
-  tag: 1.10.2-asm.1 # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.tag"}
+  hub: gcr.io/gke-release/asm # kpt-set: ${anthos.servicemesh.hub}
+  tag: 1.10.2-asm.1 # kpt-set: ${anthos.servicemesh.tag}
   meshConfig:
-    trustDomainAliases: # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.trustDomainAliases"}
-      - PROJECT_ID.svc.id.goog # {"$ref":"#/definitions/io.k8s.cli.substitutions.trust-domain"}
-    trustDomain: PROJECT_ID.svc.id.goog # {"$ref":"#/definitions/io.k8s.cli.substitutions.trust-domain"}
+    trustDomainAliases: # kpt-set: ${setters.anthos.servicemesh.trustDomainAliases}
+      - PROJECT_ID.svc.id.goog # kpt-set: ${gcloud.core.project}.svc.id.goog
+    trustDomain: PROJECT_ID.svc.id.goog # kpt-set: ${gcloud.core.project}.svc.id.goog
     defaultConfig:
       proxyMetadata:
-        GKE_CLUSTER_URL: "https://container.googleapis.com/v1/projects/PROJECT_ID/locations/us-central1-c/clusters/asm-cluster" # {"$ref":"#/definitions/io.k8s.cli.substitutions.gke-cluster-url"}
-        GCP_METADATA: "PROJECT_ID|PROJECT_NUMBER|asm-cluster|us-central1-c" # {"$ref":"#/definitions/io.k8s.cli.substitutions.gke-metadata"}
+        GKE_CLUSTER_URL: "https://container.googleapis.com/v1/projects/PROJECT_ID/locations/us-central1-c/clusters/asm-cluster" # kpt-set: https://container.googleapis.com/v1/projects/${gcloud.core.project}/locations/${gcloud.compute.location}/clusters/${gcloud.container.cluster}
+        GCP_METADATA: "PROJECT_ID|PROJECT_NUMBER|asm-cluster|us-central1-c" # kpt-set: ${gcloud.core.project}|${gcloud.project.projectNumber}|${gcloud.container.cluster}|${gcloud.compute.location}
         CA_PROVIDER: "GoogleCA"
         PLUGINS: "GoogleTokenExchange"
         USE_TOKEN_FOR_CSR: "true"
@@ -66,15 +51,15 @@ spec:
         replicaCount: 2
         env:
           - name: GKE_CLUSTER_URL
-            value: "https://container.googleapis.com/v1/projects/PROJECT_ID/locations/us-central1-c/clusters/asm-cluster" # {"$ref":"#/definitions/io.k8s.cli.substitutions.gke-cluster-url"}
+            value: "https://container.googleapis.com/v1/projects/PROJECT_ID/locations/us-central1-c/clusters/asm-cluster" # kpt-set: https://container.googleapis.com/v1/projects/${gcloud.core.project}/locations/${gcloud.compute.location}/clusters/${gcloud.container.cluster}
           - name: GCP_METADATA
-            value: "PROJECT_ID|PROJECT_NUMBER|asm-cluster|us-central1-c" # {"$ref":"#/definitions/io.k8s.cli.substitutions.gke-metadata"}
+            value: "PROJECT_ID|PROJECT_NUMBER|asm-cluster|us-central1-c" # kpt-set: ${gcloud.core.project}|${gcloud.project.projectNumber}|${gcloud.container.cluster}|${gcloud.compute.location}
           - name: SPIFFE_BUNDLE_ENDPOINTS
-            value: "PROJECT_ID.svc.id.goog|https://storage.googleapis.com/mesh-ca-resources/spiffe_bundle.json" # {"$ref":"#/definitions/io.k8s.cli.substitutions.spiffe-bundle-endpoints"}
+            value: "PROJECT_ID.svc.id.goog|https://storage.googleapis.com/mesh-ca-resources/spiffe_bundle.json" # kpt-set: ${gcloud.core.project}.svc.id.goog|https://storage.googleapis.com/mesh-ca-resources/spiffe_bundle.json
           - name: ENABLE_STACKDRIVER_MONITORING
-            value: "true" # {"$ref":"#/definitions/io.k8s.cli.setters.anthos.servicemesh.controlplane.monitoring.enabled"}
+            value: "true" # kpt-set: ${anthos.servicemesh.controlplane.monitoring.enabled}
           - name: TOKEN_AUDIENCES
-            value: "PROJECT_ID.svc.id.goog" # {"$ref":"#/definitions/io.k8s.cli.substitutions.token-audiences"}
+            value: "PROJECT_ID.svc.id.goog" # kpt-set: istio-ca,${gcloud.core.project}.svc.id.goog
           - name: PILOT_ENABLE_CROSS_CLUSTER_WORKLOAD_ENTRY
             value: "true"
   values:
@@ -100,9 +85,9 @@ spec:
         servicePort: 15463
       sds:
         token:
-          aud: "PROJECT_ID.svc.id.goog" # {"$ref":"#/definitions/io.k8s.cli.substitutions.trust-domain"}
+          aud: "PROJECT_ID.svc.id.goog" # kpt-set: ${gcloud.core.project}.svc.id.goog
       multiCluster:
         # Provided to ensure a human readable name rather than a UUID.
-        clusterName: "cn-PROJECTID-us-central1-c-asm-cluster" # {"$ref":"#/definitions/io.k8s.cli.substitutions.cluster-name"}
-      meshID: "proj-PROJECT_NUMBER" # {"$ref":"#/definitions/io.k8s.cli.substitutions.mesh-id"}
-      network: "NETWORK_ID" # {"$ref":"#/definitions/io.k8s.cli.setters.gcloud.compute.network"}
+        clusterName: "cn-PROJECTID-us-central1-c-asm-cluster" # kpt-set: cn-${gcloud.core.project}-${gcloud.compute.location}-${gcloud.container.cluster}
+      meshID: "proj-PROJECT_NUMBER" # kpt-set: proj-${gcloud.project.environProjectNumber}
+      network: "NETWORK_ID" # kpt-set: ${gcloud.compute.network}
